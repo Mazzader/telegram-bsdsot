@@ -7,37 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
-import org.jetbrains.exposed.dao.*
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
-
-object Users : IntIdTable() {
-    val name = varchar("name", 50).index()
-    val city = reference("city", Cities)
-    val age = integer("age")
-}
-
-object Cities: IntIdTable() {
-    val name = varchar("name", 50)
-}
-
-class User(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<User>(Users)
-
-    var name by Users.name
-    var city by City referencedOn Users.city
-    var age by Users.age
-}
-
-class City(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<City>(Cities)
-
-    var name by Cities.name
-    val users by User referrersOn Users.city
-}
-
 
 class TelegramBotApplication
 
@@ -64,6 +33,10 @@ class Bot: TelegramLongPollingBot() {
             execute(SendMessage()
                     .setReplyMarkup(keyboard)
                     .setChatId(update.message.chatId).setText("Hi, Bullshit"))
+        }
+        if (update.message.text == "Добавить товар"){
+            execute(SendMessage()
+                    .setChatId(update.message.chatId).setText("Введите название товара"))
         }
     }
 
